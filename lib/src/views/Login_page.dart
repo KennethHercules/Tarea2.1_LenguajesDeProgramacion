@@ -1,88 +1,76 @@
 import 'package:flutter/material.dart';
-import '../widgets/custom_textfield.dart';
-import 'home_page.dart'; // para navegar al HomePage
+import 'package:go_router/go_router.dart';
+import 'package:todo_app/src/widgets/custom_text_field.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   void _login() {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-      // Validación simulada: correo institucional y número de cuenta
-      if (email.endsWith('@unah.hn') && password == '20241012345') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomePage()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Correo o contraseña incorrectos')),
-        );
-      }
+    // Validación básica
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Todos los campos son obligatorios')),
+      );
+      return;
     }
+
+    // Validar correo institucional
+    if (!email.endsWith('@unah.hn')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El correo debe ser @unah.hn')),
+      );
+      return;
+    }
+
+    // Validar contraseña (ejemplo: número de cuenta = 8 dígitos)
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('La contraseña debe tener al menos 6 caracteres')),
+      );
+      return;
+    }
+
+    // Si todo es correcto, navegar a HomePage
+    context.go('/home'); // Asegúrate de tener esta ruta en main.dart
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Inicio de sesión')),
+      appBar: AppBar(title: const Text('Iniciar Sesión')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomTextField(
-                controller: _emailController,
+                controller: emailController,
                 label: 'Correo institucional',
+                keyboardType: TextInputType.emailAddress,
                 icon: Icons.email,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese su correo';
-                  }
-                  if (!value.endsWith('@unah.hn')) {
-                    return 'Debe ser un correo institucional (@unah.hn)';
-                  }
-                  return null;
-                },
               ),
-              const SizedBox(height: 16),
               CustomTextField(
-                controller: _passwordController,
-                label: 'Contraseña (número de cuenta)',
+                controller: passwordController,
+                label: 'Contraseña',
+                isPassword: true,
                 icon: Icons.lock,
-                obscureText: _obscurePassword,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese su contraseña';
-                  }
-                  return null;
-                },
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _login,
                 child: const Text('Iniciar sesión'),
@@ -90,9 +78,9 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/register');
+                  context.go('/register'); // Navega a pantalla de registro
                 },
-                child: const Text('¿No tienes cuenta? Regístrate aquí'),
+                child: const Text('¿No tienes cuenta? Regístrate'),
               ),
             ],
           ),
@@ -101,3 +89,4 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+

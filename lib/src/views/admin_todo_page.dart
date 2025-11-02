@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:todo_app/api/todos.dart';
 import 'package:todo_app/src/shared/utils.dart';
+import 'package:todo_app/src/widgets/custom_text_field.dart';
 
 class AdminTodoPage extends StatelessWidget {
   AdminTodoPage({super.key, this.todo});
@@ -14,7 +15,7 @@ class AdminTodoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //Id que me permite consultar a la BBDD la información actualziada
+    // Id que me permite consultar a la BBDD la información actualizada
     final todoId = GoRouterState.of(context).pathParameters['id'];
 
     if (todo != null) {
@@ -31,37 +32,19 @@ class AdminTodoPage extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Column(
           children: [
-            TextField(
-              focusNode: titleFocus,
+            CustomTextField(
               controller: titleController,
-              decoration: InputDecoration(
-                label: Text('Titulo'),
-                hint: Text('Eje. Crear opción de eliminar'),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-
-                // suffixIcon: IconButton(
-                //   icon: Icon(Icons.visibility),
-                //   onPressed: () {},
-                // ),
-                prefixIcon: Icon(Icons.text_fields_rounded),
-              ),
-
-              maxLines: 1,
-              maxLength: 50,
-              obscureText: false,
-              keyboardType: TextInputType.visiblePassword,
-              // style: TextStyle(color: Colors.red),
+              label: 'Titulo',
+              hint: 'Eje. Crear opción de eliminar',
+              icon: Icons.text_fields_rounded,
             ),
-            SizedBox(height: 16),
-            TextField(
+            CustomTextField(
               controller: descriptionController,
-              maxLines: 4,
-              decoration: InputDecoration(label: Text('Descripción')),
+              label: 'Descripción',
+              maxLines: 4, // ahora soporta varias líneas
             ),
           ],
         ),
@@ -70,22 +53,11 @@ class AdminTodoPage extends StatelessWidget {
         backgroundColor: Colors.blue[300],
         onPressed: () {
           if (titleController.text.isEmpty) {
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //   SnackBar(
-            //     content: Text(
-            //       'Debe ingresar un titulo',
-            //       style: TextStyle(color: Colors.red[50]),
-            //     ),
-            //     backgroundColor: Colors.red,
-            //   ),
-            // );
-
             Utils.showSnackBar(
               context: context,
               title: "El titulo es obligatorio",
               color: Colors.red,
             );
-
             return;
           }
 
@@ -102,34 +74,16 @@ class AdminTodoPage extends StatelessWidget {
             final indice = todoList.indexWhere(
               (todo) => todo['id'].toString() == todoId,
             );
-
             todoList[indice] = newTodo;
           }
 
-          // final snackBar = SnackBar(
-          //   content: const Text('Yay! A SnackBar!'),
-          //   action: SnackBarAction(
-          //     label: 'Undo',
-          //     onPressed: () {
-          //       // Some code to undo the change.
-          //     },
-          //   ),
-          // );
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text('Tarea creada correctamente'),
-          //     // backgroundColor: ,
-          //     duration: Duration(days: 4),
-          //     action: SnackBarAction(label: 'Cerrar', onPressed: () {}),
-          //   ),
-          // );
           Utils.showSnackBar(
             context: context,
             title: "Tarea creada correctamente",
           );
 
-          titleController.text = '';
-          descriptionController.text = '';
+          titleController.clear();
+          descriptionController.clear();
 
           context.pop();
         },
@@ -138,3 +92,4 @@ class AdminTodoPage extends StatelessWidget {
     );
   }
 }
+

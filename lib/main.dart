@@ -21,40 +21,43 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: GoRouter(
-  initialLocation: '/',
-  routes: [
-    GoRoute(path: '/', name: 'login', builder: (context, state) => LoginPage()),
-    GoRoute(path: '/register', name: 'register', builder: (context, state) => RegisterPage()),
-    GoRoute(
-      path: '/todos',
-      name: 'todo-list',
-      builder: (context, state) => HomePage(),
-      routes: [
-        GoRoute(
-          path: '/create',
-          name: 'new-todo',
-          builder: (context, state) => AdminTodoPage(),
-        ),
-        GoRoute(
-          path: '/:id',
-          name: 'update-todo',
-          builder: (context, state) {
-            final todo = state.extra as Map<String, dynamic>?;
-            return AdminTodoPage(todo: todo);
-          },
-        ),
-      ],
-    ),
-  ],
-)
+        initialLocation: '/',
+        routes: [
+          GoRoute(
+            path: '/',
+            name: 'login',
+            builder: (context, state) => LoginPage(),
+          ),
+          GoRoute(
+            path: '/register',
+            name: 'register',
+            builder: (context, state) => RegisterPage(),
+          ),
+          GoRoute(
+            path: '/todos',
+            name: 'todo-list',
+            builder: (context, state) => HomePage(),
+            routes: [
+              GoRoute(
+                path: '/create',
+                name: 'new-todo',
+                builder: (context, state) => AdminTodoPage(),
+              ),
+              GoRoute(
+                path: '/:id',
+                name: 'update-todo',
+                builder: (context, state) {
+                  final todo = state.extra as Map<String, dynamic>?;
+                  return AdminTodoPage(todo: todo);
+                },
+              ),
+            ],
+          ),
+        ],
+      ), // ← IMPORTANTE: coma agregada aquí
       debugShowCheckedModeBanner: false,
       title: 'Todo - App',
-      // initialRoute: '/',
-      // home: AdminTodoPage(), // mi primer widget personalizado
-      // routes: {
-      //   '/': (context) => HomePage(),
-      //   '/admin-todos': (context) => AdminTodoPage(),
-      // },
     );
   }
 }
+

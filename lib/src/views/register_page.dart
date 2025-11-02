@@ -1,108 +1,112 @@
 import 'package:flutter/material.dart';
-import '../widgets/custom_textfield.dart';
+import 'package:go_router/go_router.dart';
+import 'package:todo_app/src/widgets/custom_text_field.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({Key? key}) : super(key: key);
+  const RegisterPage({super.key});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
 
   void _register() {
-    if (_formKey.currentState!.validate()) {
-      // Aquí podrías guardar los datos en Firebase o localmente
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+    final phone = phoneController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro exitoso')),
+        const SnackBar(content: Text('Todos los campos son obligatorios')),
       );
-      Navigator.pop(context); // Regresa al login
+      return;
     }
-  }
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) return 'Ingrese su contraseña';
-    if (value.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
-    final specialCharRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
-    if (!specialCharRegex.hasMatch(value)) {
-      return 'La contraseña debe tener al menos un carácter especial';
+    if (!email.endsWith('@unah.hn')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El correo debe ser @unah.hn')),
+      );
+      return;
     }
-    return null;
-  }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return 'Ingrese su correo';
-    if (!value.endsWith('@unah.hn')) return 'Debe ser un correo institucional (@unah.hn)';
-    return null;
+    // Contraseña: mínimo 6 caracteres y al menos un caracter especial
+    final passwordRegex = RegExp(r'^(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$');
+    if (!passwordRegex.hasMatch(password)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'La contraseña debe tener al menos 6 caracteres y un caracter especial')),
+      );
+      return;
+    }
+
+    // Registro simulado
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Registro exitoso')),
+    );
+
+    // Limpiar campos
+    nameController.clear();
+    emailController.clear();
+    phoneController.clear();
+    passwordController.clear();
+
+    // Ir al login
+    context.go('/login');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Registro de usuario')),
+      appBar: AppBar(title: const Text('Registro')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
             children: [
               CustomTextField(
-                controller: _nameController,
+                controller: nameController,
                 label: 'Nombre completo',
                 icon: Icons.person,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Ingrese su nombre';
-                  }
-                  return null;
-                },
               ),
-              const SizedBox(height: 16),
               CustomTextField(
-                controller: _emailController,
+                controller: emailController,
                 label: 'Correo institucional',
+                keyboardType: TextInputType.emailAddress,
                 icon: Icons.email,
-                validator: _validateEmail,
               ),
-              const SizedBox(height: 16),
               CustomTextField(
-                controller: _phoneController,
+                controller: phoneController,
                 label: 'Teléfono',
-                icon: Icons.phone,
                 keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Ingrese su teléfono';
-                  return null;
-                },
+                icon: Icons.phone,
               ),
-              const SizedBox(height: 16),
               CustomTextField(
-                controller: _passwordController,
+                controller: passwordController,
                 label: 'Contraseña',
+                isPassword: true,
                 icon: Icons.lock,
-                obscureText: _obscurePassword,
-                validator: _validatePassword,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _register,
                 child: const Text('Registrarse'),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  context.go('/login');
+                },
+                child: const Text('¿Ya tienes cuenta? Inicia sesión'),
               ),
             ],
           ),
