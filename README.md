@@ -19,3 +19,7 @@ samples, guidance on mobile development, and a full API reference.
 # Tarea2.1_LenguajesDeProgramacion
 Tarea 2.1 de Lenguajes de Programacion 
 
+# informacion de estudiantes 
+Nombre: Kenneth Geovani Hercules Rodezno    #cuenta: 20212021218
+Nombre: Isaias Josue Alas Duron             #cuenta: 20222000980
+
